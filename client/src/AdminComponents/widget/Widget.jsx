@@ -1,6 +1,6 @@
 import Card from "AdminComponents/card";
 
-const Widget = ({ icon, title, subtitle, button,}) => {
+const Widget = ({ icon, title, subtitle,}) => {
  
 
   return (
@@ -21,11 +21,7 @@ const Widget = ({ icon, title, subtitle, button,}) => {
         </h4>
       </div>
     
-      <button
-    className="px-4 py-2 text-indigo-600 bg-indigo-50 rounded-lg duration-150 hover:bg-indigo-100 active:bg-indigo-200 ml-28"
->
-   {button}
-    </button>
+     
 
 </Card>
     

@@ -79,7 +79,7 @@ const routes = [
   layout: "/admin",
   icon: <BiSlider className="h-6 w-6" />,
   path: "data-tables",
-  component: <DataTables />,
+  component: < LeaveManagement/>,
 },
 
 
@@ -137,6 +137,7 @@ const routes = [
   layout: "/user",
   path: "layouts",
   icon: <MdLogout className="h-6 w-6" />,
+  
  
 },
 ];
