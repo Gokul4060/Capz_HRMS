@@ -8,7 +8,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:8888",
+        target: "http://capz-hrms-api.vercel.app",
         changeOrigin: true,
       },
     },
