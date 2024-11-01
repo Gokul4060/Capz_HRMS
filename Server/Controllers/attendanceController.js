@@ -210,3 +210,45 @@ export const updateAttendance = async (req, res) => {
     });
   }
 };
+
+// Delete attendance records within a date range (Admin only)
+export const deleteAttendanceRecords = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+
+    // Ensure both startDate and endDate are provided
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        status: false,
+        message: 'Please provide both startDate and endDate.',
+      });
+    }
+
+    // Parse the startDate and endDate into moment objects
+    const start = moment(startDate).startOf('day').toDate();
+    const end = moment(endDate).endOf('day').toDate();
+
+    // Find and delete all attendance records between startDate and endDate
+    const deletedRecords = await Attendance.deleteMany({
+      date: {
+        $gte: start,
+        $lte: end,
+      },
+    });
+
+    if (deletedRecords.deletedCount === 0) {
+      return res.status(404).json({
+        status: false,
+        message: 'No attendance records found within the provided date range.',
+      });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: `${deletedRecords.deletedCount} attendance records deleted successfully`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: false, message: 'Server error' });
+  }
+};

@@ -6,7 +6,10 @@ import Loading from "../../../../Components/Tools/Loader";
 import Button from "../../../../Components/Tools/Button";
 import { toast } from "sonner";
 import { useRegisterMutation } from "../../../../redux/slices/api/authApiSlice";
-import { useUpdateUserMutation } from "../../../../redux/slices/api/userApiSlice";
+import {
+  useUpdateUserMutation,
+  useGetApproversQuery,
+} from "../../../../redux/slices/api/userApiSlice";
 
 const AddEmployee = ({ userData }) => {
   let defaultValues = userData ?? {};
@@ -15,20 +18,29 @@ const AddEmployee = ({ userData }) => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm({ defaultValues });
 
   const dispatch = useDispatch();
   const [addNewUser, { isLoading }] = useRegisterMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
+
+  const {
+    data: approversData,
+    isLoading: isApproversLoading,
+    error: approversError,
+  } = useGetApproversQuery();
+  const approvers = approversData?.approvers || []; 
+
   const handleOnSubmit = async (data) => {
     try {
-      // Reset all role fields to false
+      const employeeID = `${data.employeeIdCode}${data.employeeIdNumber}`;
+
       data.isAdmin = false;
       data.isManager = false;
-      data.isDeveloper = false;
+      data.isEmployee = false;
 
-      // Set the correct role field based on the selected role
       switch (data.role) {
         case "Admin":
           data.isAdmin = true;
@@ -36,33 +48,33 @@ const AddEmployee = ({ userData }) => {
         case "Manager":
           data.isManager = true;
           break;
-        case "Developer":
-          data.isDeveloper = true;
+        case "Employee":
+          data.isEmployee = true;
           break;
         default:
           break;
       }
 
-      // Proceed with either adding a new user or updating an existing user
       if (userData) {
-        // Update the user profile
         const result = await updateUser({
           ...data,
+          employeeID,
           _id: userData._id,
         }).unwrap();
         toast.success("Profile updated successfully");
 
-        // Update the local user data if updating current user
         if (userData._id === user._id) {
           dispatch(setCredentials({ ...result.user }));
         }
       } else {
-        // Register a new user
-        await addNewUser({ ...data, password: data.password }).unwrap();
+        await addNewUser({
+          ...data,
+          employeeID,
+          password: data.password,
+        }).unwrap();
         toast.success("New User added successfully");
       }
 
-      // Reload the page and close the form
       window.location.reload();
       setTimeout(() => {
         setOpen(false);
@@ -71,6 +83,8 @@ const AddEmployee = ({ userData }) => {
       toast.error("Something went wrong");
     }
   };
+
+  const selectedRole = watch("role");
 
   return (
     <div className="space-y-8 p-6">
@@ -112,6 +126,46 @@ const AddEmployee = ({ userData }) => {
             })}
             error={errors.email ? errors.email.message : ""}
           />
+          {/* Employee ID Input with left selector and right number input */}
+          <div className="w-full rounded-2xl">
+            <label className="block text-sm font-medium text-gray-700">
+              ID
+            </label>
+            <div className="flex">
+              <select
+                name="employeeIdCode"
+                className="block w-1/3 rounded-l-2xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                {...register("employeeIdCode", {
+                  required: !userData ? "Employee ID code is required!" : false,
+                })}
+              >
+                <option value="">Select ID Code</option>
+                <option value="AM">AM</option>
+                <option value="M">M</option>
+                <option value="EM">EM</option>
+              </select>
+              <input
+                type="number"
+                placeholder="ID Number"
+                className="w-2/3 rounded-r-2xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                {...register("employeeIdNumber", {
+                  required: !userData
+                    ? "Employee ID number is required!"
+                    : false,
+                })}
+              />
+            </div>
+            {errors.employeeIdCode && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.employeeIdCode.message}
+              </p>
+            )}
+            {errors.employeeIdNumber && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.employeeIdNumber.message}
+              </p>
+            )}
+          </div>
           {/* Role Selector */}
           <div className="w-full rounded-2xl">
             <label className="block text-sm font-medium text-gray-700">
@@ -125,12 +179,45 @@ const AddEmployee = ({ userData }) => {
               <option value="">Select Role</option>
               <option value="Admin">Admin</option>
               <option value="Manager">Manager</option>
-              <option value="Developer">Developer</option>
+              <option value="Employee">Employee</option>
             </select>
             {errors.role && (
               <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
             )}
           </div>
+          {/* Reporting Manager Selector - Enabled only for Employee role */}
+          {selectedRole === "Employee" && (
+            <div className="w-full rounded-2xl">
+              <label className="block text-sm font-medium text-gray-700">
+                Reporting Manager
+              </label>
+              {isApproversLoading ? (
+                <Loading />
+              ) : approversError ? (
+                <p className="text-red-500">Failed to load managers</p>
+              ) : (
+                <select
+                  name="reportingManager"
+                  className="w-full mt-1 block rounded-2xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  {...register("reportingManager", {
+                    required: "Reporting Manager is required for employees!",
+                  })}
+                >
+                  <option value="">Select Reporting Manager</option>
+                  {approvers.map((manager) => (
+                    <option key={manager._id} value={manager._id}>
+                      {manager.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {errors.reportingManager && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.reportingManager.message}
+                </p>
+              )}
+            </div>
+          )}
           {!userData && (
             <Textbox
               placeholder="Password"

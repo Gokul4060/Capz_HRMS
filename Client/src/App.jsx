@@ -11,21 +11,27 @@ import { setOpenSidebar } from "./redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Landing from "./Pages/Landing";
 import AdminDashboard from "./Pages/Dashboards/adminDashboard";
+import Main from "./Pages/demo/main"
+
 import UserManagement from "./Pages/Mainpages/AdminMain/Adduser/allEmployees";
 import Attendance from "./Pages/Mainpages//Attendance/Attendance";
 import AdminAttendanceUpdate from "./Pages/Mainpages/AdminMain/adminAttendance";
 import PROFILE from "./Pages/Profile/profile";
+import EmployeeDetailPage from "./Pages/Mainpages/AdminMain/Adduser/details";
+import EmployeeDetails from "./Pages/Mainpages/AdminMain/Adduser/employeeDetails";
 import ManagerAttendance from "./Pages/Mainpages/Attendance/managerAttendance";
 import DeveloperDashboard from "./Pages/Dashboards/developerDashboard";
 import ManagerDashboard from "./Pages/Dashboards/managerDashboard";
 import ManagerRecords from "./Pages/Mainpages/Leave/Manager/managerRecords";
 import UserManage from "./Pages/Mainpages/AdminMain/userManagement";
 import Leave from "./Pages/Mainpages/Leave/leave";
-import CreateTask from "./Pages/Tasks/task";
 import TimeSheet from "./Pages/Timesheet/timeSheet";
 import TimeSheetget from "./Pages/Mainpages/AdminMain/TimeSheet/timesheetget";
-import DemoDash from "./Pages/demo/demoDash";
 import TimeDetails from "./Pages/Timesheet/infoTime"
+import TimeSubmission from "./Pages/Timesheet/submission";
+import Project from "./Pages/Mainpages/project/project";
+import TaskDetails from "./Components/Layout/Project/ProjectDetails"
+
 
 function Layout() {
   const { user } = useSelector((state) => state.auth);
@@ -114,7 +120,7 @@ function App() {
         {/* Protected Routes */}
         <Route element={<Layout />}>
           <Route path="/adminDashboard" element={<AdminDashboard />} />
-          <Route path="/developerDashboard" element={<DeveloperDashboard />} />
+          <Route path="/employeeDashboard" element={<DeveloperDashboard />} />
           <Route path="/ManagerDashboard" element={<ManagerDashboard />} />
           <Route path="/userManagement" element={<UserManagement />} />
           <Route path="/userManage" element={<UserManage />} />
@@ -128,15 +134,20 @@ function App() {
           <Route path="/leavereq" element={<ManagerRecords />} />
           <Route path="/leave" element={<Leave />} />
           {/*Tasks Route */}
-          <Route path="/tasks" element={<CreateTask />} />
+          <Route path="/mainTask" element={<Main />} />
           {/*Timesheet Route */}
           <Route path="/timesheet" element={<TimeSheet />} />
           <Route path="/timeget" element={<TimeSheetget />} />
           <Route path="/timesheet/:details" element={<TimeDetails />} />
-
+          <Route path="/submission" element={<TimeSubmission />} />
           {/*profile Route */}
           <Route path="/profile" element={<PROFILE />} />
-          <Route path="/demodash" element={<DemoDash />} />
+          <Route path="/employee" element={<EmployeeDetails />} />
+          <Route path="/employee/:id" element={<EmployeeDetailPage />} />
+
+          {/*project Route */}
+          <Route path="/project" element={<Project />} />
+          <Route path="/project/:id" element={<TaskDetails />} />
         </Route>
       </Routes>
 

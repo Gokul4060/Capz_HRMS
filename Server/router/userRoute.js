@@ -10,9 +10,10 @@ import {
   profileinfo,
   getProfileInfo,
   getApprovers,
+  getProfileInfoById,
 } from "../controllers/userController.js";
 
-import { protectRoute, isAdminRoute } from "../middlewares/authMiddlewave.js";
+import { protectRoute, isAdminOrManagerRoute, isAdminRoute } from "../middlewares/authMiddlewave.js";
 
 const router = express.Router();
 
@@ -21,13 +22,21 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 
-router.get("/get-employee", protectRoute, isAdminRoute, getEmployeeList);
+router.get(
+  "/get-employee",
+  protectRoute,
+  isAdminOrManagerRoute,
+  isAdminRoute,
+  getEmployeeList
+);
 router.get("/approvers", protectRoute, getApprovers);
 
 //profile 
 router.put("/profile", protectRoute, updateUserProfile);
 router.put("/data", protectRoute, profileinfo);
 router.get("/getdata", protectRoute, getProfileInfo);
+router.get("/data/:id", protectRoute, getProfileInfoById);
+
 
 
 router

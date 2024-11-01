@@ -9,13 +9,13 @@ const TimesheetList = () => {
     error,
   } = useGetAllTimesheetsQuery();
 
-  // Handle loading state
+ 
   if (isLoading) return <div>Loading...</div>;
 
-  // Handle error state
+ 
   if (isError) return <div>Error: {error?.data?.message}</div>;
 
-  // Ensure timesheets is an array, or fallback to an empty array
+  
   const timesheetList = Array.isArray(timesheets) ? timesheets : [];
 
   return (

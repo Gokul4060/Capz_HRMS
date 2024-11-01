@@ -1,8 +1,8 @@
-import TimeSheet from "../Models/timesheet.js"; // Assuming you have a TimeSheet model
+import TimeSheet from "../Models/timesheet.js"; 
 import User from "../Models/userModel.js";
-import { handleError } from "../utils/server.js"; // Reusing error handling from userController
+import { handleError } from "../utils/server.js"; 
 
-// Create or update timesheet
+
 export const createOrUpdateTimesheet = async (req, res) => {
   try {
     const { userId, isAdmin } = req.user;
@@ -16,11 +16,11 @@ export const createOrUpdateTimesheet = async (req, res) => {
       totalHours,
     } = req.body;
 
-    // Find or create a new timesheet entry for the user
+    
     let timesheet = await TimeSheet.findOne({ user: userId, date });
 
     if (timesheet) {
-      // Update existing timesheet
+
       timesheet.regularHours = regularHours || timesheet.regularHours;
       timesheet.overtimeHours = overtimeHours || timesheet.overtimeHours;
       timesheet.sickLeave = sickLeave || timesheet.sickLeave;
@@ -52,7 +52,7 @@ export const createOrUpdateTimesheet = async (req, res) => {
   }
 };
 
-// Get timesheet for a specific user or for admin to view all timesheets
+
 export const getTimesheets = async (req, res) => {
   try {
     const { userId, isAdmin } = req.user;
@@ -60,9 +60,9 @@ export const getTimesheets = async (req, res) => {
 
     const filter = {};
     if (!isAdmin) {
-      filter.user = userId; // Non-admin can only access their own timesheets
+      filter.user = userId; 
     } else if (queryUserId) {
-      filter.user = queryUserId; // Admin can filter by user ID
+      filter.user = queryUserId; 
     }
 
     if (startDate && endDate) {

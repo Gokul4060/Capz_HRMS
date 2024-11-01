@@ -29,8 +29,10 @@ const NotificationPanel = () => {
 
   const viewHandler = async (el) => {
     setSelected(el);
-    await readHandler("one", el._id); // Corrected the call to readHandler
-    setOpen(true);
+    await readHandler("one", el._id);
+    
+    
+    
   };
 
   const callsToAction = [

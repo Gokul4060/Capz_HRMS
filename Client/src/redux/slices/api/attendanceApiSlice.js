@@ -32,19 +32,12 @@ export const attendanceApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    updateAttendance: builder.mutation({
-      query: ({ attendanceId, clockIn, clockOut, status }) => ({
-        url: `${ATTENDANCE_URL}/${attendanceId}`,
-        method: "PUT",
-        body: { clockIn, clockOut, status },
-        credentials: "include",
-      }),
-    }),
-    deleteAttendance: builder.mutation({
-      query: (attendanceId) => ({
-        url: `${ATTENDANCE_URL}/${attendanceId}`,
+    deleteAttendanceRecords: builder.mutation({
+      query: ({ startDate, endDate }) => ({
+        url: `${ATTENDANCE_URL}/delete/${id}`,
         method: "DELETE",
         credentials: "include",
+        body: { startDate, endDate },
       }),
     }),
   }),
@@ -55,5 +48,6 @@ export const {
   useMarkClockOutMutation,
   useGetUserAttendanceQuery,
   useGetAllAttendanceQuery,
-  useUpdateAttendanceMutation,
+  useDeleteAttendanceRecordsMutation,
+  
 } = attendanceApiSlice;

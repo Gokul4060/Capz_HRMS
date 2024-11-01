@@ -1,7 +1,7 @@
 import TimeEntry from "../Models/timeentryModel.js";
 import { handleError } from "../middlewares/errorMiddlewaves.js";
 
-// Start Time Entry
+
 export const startTimeEntry = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -21,10 +21,10 @@ export const startTimeEntry = async (req, res) => {
   }
 };
 
-// End Time Entry
+
 export const endTimeEntry = async (req, res) => {
   try {
-    const { id } = req.params; // TimeEntry ID
+    const { id } = req.params; 
 
     const timeEntry = await TimeEntry.findById(id);
 
@@ -36,8 +36,7 @@ export const endTimeEntry = async (req, res) => {
 
     timeEntry.endTime = new Date();
     timeEntry.duration =
-      (timeEntry.endTime - timeEntry.startTime) / (1000 * 60); // Duration in minutes
-
+      (timeEntry.endTime - timeEntry.startTime) / (1000 * 60); 
     await timeEntry.save();
 
     res
@@ -48,7 +47,7 @@ export const endTimeEntry = async (req, res) => {
   }
 };
 
-// Get Time Tracking Data
+
 export const getTimeTrackingData = async (req, res) => {
   try {
     const { userId } = req.user;

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useGetAllAttendanceQuery } from "../../../redux/slices/api/attendanceApiSlice";
+import {
+  useGetAllAttendanceQuery,
+  useDeleteAttendanceRecordsMutation, // Import the delete mutation hook
+} from "../../../redux/slices/api/attendanceApiSlice";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import DatePicker from "react-datepicker";
@@ -11,13 +14,16 @@ const AdminAttendance = () => {
     error,
     isLoading,
   } = useGetAllAttendanceQuery();
+
+  const [deleteAttendanceRecords, { isLoading: isDeleting }] =
+    useDeleteAttendanceRecordsMutation(); // Use the delete mutation
+
   const [errorMessage, setErrorMessage] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
   const attendanceRecords = attendanceResponse?.attendanceRecords || [];
 
-  // Filter attendance records based on the date range
   const filteredAttendanceRecords = attendanceRecords.filter((record) => {
     const recordDate = new Date(record.date);
     const isWithinRange =
@@ -26,9 +32,8 @@ const AdminAttendance = () => {
     return isWithinRange;
   });
 
-  // Pagination state and logic
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5; // Number of rows per page
+  const rowsPerPage = 5;
   const totalPages = Math.ceil(filteredAttendanceRecords.length / rowsPerPage);
 
   const paginatedAttendanceRecords = filteredAttendanceRecords.slice(
@@ -56,6 +61,23 @@ const AdminAttendance = () => {
       setErrorMessage("Failed to fetch all attendance records.");
     }
   }, [error, errorMessage]);
+
+  const handleDeleteAll = async () => {
+    if (!startDate || !endDate) {
+      setErrorMessage("Please select both start and end dates.");
+      return;
+    }
+
+    setErrorMessage(""); // Clear previous error message
+
+    try {
+      await deleteAttendanceRecords({ startDate, endDate }).unwrap(); // Trigger the delete mutation
+      alert("Attendance records deleted successfully.");
+    } catch (err) {
+      console.error("Error deleting attendance records:", err);
+      setErrorMessage("Failed to delete attendance records.");
+    }
+  };
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -96,7 +118,6 @@ const AdminAttendance = () => {
         <h1 className="text-xl font-medium">Attendance Records</h1>
       </div>
 
-      {/* Date Filter and Download Button */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4">
           <div>
@@ -130,18 +151,26 @@ const AdminAttendance = () => {
           </div>
         </div>
 
-        {/* Download PDF Button at the right end */}
-        <button
-          className="bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white hover:bg-green-700 hover:text-black font-semibold py-2 px-4 rounded-2xl text-sm"
-          onClick={downloadPDF}
-        >
-          Download PDF
-        </button>
+        <div className="flex justify-between items-center mb-4">
+          <button
+            className="bg-red-500 text-white hover:bg-red-700 hover:text-black font-semibold py-2 px-4 rounded-2xl text-sm"
+            onClick={handleDeleteAll}
+            disabled={isDeleting}
+          >
+            {isDeleting ? "Deleting..." : "Delete All"}
+          </button>
+
+          <button
+            className="bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white hover:bg-green-700 hover:text-black font-semibold py-2 px-4 rounded-2xl text-sm"
+            onClick={downloadPDF}
+          >
+            Download PDF
+          </button>
+        </div>
       </div>
 
       {errorMessage && <div className="text-red-500 mb-4">{errorMessage}</div>}
 
-      {/* Attendance Records Table */}
       {paginatedAttendanceRecords.length > 0 ? (
         <div className="overflow-x-auto shadow-lg rounded-lg">
           <table className="min-w-full leading-normal">
@@ -209,7 +238,6 @@ const AdminAttendance = () => {
         <p>No attendance records found for the selected date range.</p>
       )}
 
-      {/* Pagination Controls */}
       <div className="flex justify-end mt-6 space-x-2">
         <button
           onClick={goToPreviousPage}

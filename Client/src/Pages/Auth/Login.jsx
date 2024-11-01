@@ -22,37 +22,39 @@ const Login = () => {
 
   const [login, { isLoading }] = useLoginMutation();
 
-  const submitHandler = async (data) => {
-    try {
-      const result = await login(data).unwrap();
-      dispatch(setCredentials(result));
+ const submitHandler = async (data) => {
+   try {
+     const result = await login(data).unwrap();
+     dispatch(setCredentials(result));
 
-      // Redirect based on role
-      if (result.isAdmin) {
-        navigate("/adminDashboard");
-      } else if (result.isManager) {
-        navigate("/managerDashboard");
-      } else if (result.isDeveloper) {
-        navigate("/developerDashboard");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error?.data?.message || error.message);
-    }
-  };
+     // Redirect based on role
+     if (result.isAdmin) {
+       navigate("/adminDashboard");
+     } else if (result.isManager) {
+       navigate("/managerDashboard");
+     } else if (result.isEmployee) {
+       // Updated from isDeveloper
+       navigate("/employeeDashboard"); // Updated to employee dashboard
+     }
+   } catch (error) {
+     console.log(error);
+     toast.error(error?.data?.message || error.message);
+   }
+ };
 
-  useEffect(() => {
-    if (user) {
-      // Redirect based on role
-      if (user.isAdmin) {
-        navigate("/adminDashboard");
-      } else if (user.isManager) {
-        navigate("/managerDashboard");
-      } else if (user.isDeveloper) {
-        navigate("/developerDashboard");
-      }
-    }
-  }, [user, navigate]);
+ useEffect(() => {
+   if (user) {
+     // Redirect based on role
+     if (user.isAdmin) {
+       navigate("/adminDashboard");
+     } else if (user.isManager) {
+       navigate("/managerDashboard");
+     } else if (user.isEmployee) {
+       
+       navigate("/employeeDashboard"); 
+     }
+   }
+ }, [user, navigate]);
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center flex-col lg:flex-row bg-[#f3f4f6]">

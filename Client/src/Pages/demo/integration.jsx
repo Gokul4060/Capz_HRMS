@@ -10,6 +10,7 @@ const Integration = () => {
           alt="Slack logo"
           className="w-12 h-12"
         />
+        
         <div>
           <p className="text-sm text-gray-500">
             Integration involves identifying which components to integrate and

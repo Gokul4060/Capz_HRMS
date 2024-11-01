@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-import User from "../Models/userModel.js"
-
+import User from "../Models/userModel.js";
 
 const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies?.token; 
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({ status: false, message: "Not authorized" });
@@ -12,7 +11,7 @@ const protectRoute = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decodedToken.userId).select(
-      "isAdmin isManager isDeveloper email role"
+      "isAdmin isManager isEmployee email role"
     );
 
     if (!user) {
@@ -20,11 +19,11 @@ const protectRoute = async (req, res, next) => {
     }
 
     req.user = {
-      userId: decodedToken.userId, 
+      userId: decodedToken.userId,
       email: user.email,
       isAdmin: user.isAdmin,
       isManager: user.isManager,
-      isDeveloper: user.isDeveloper,
+      isEmployee: user.isEmployee, // Modified here
       role: user.role,
     };
 
@@ -46,14 +45,12 @@ const isAdminOrManagerRoute = (req, res, next) => {
   }
 };
 
-
-
 export const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; 
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, "yourSecretKey"); 
+      const decoded = jwt.verify(token, "yourSecretKey");
       req.userId = decoded.id;
       next();
     } catch (err) {
@@ -75,6 +72,14 @@ const isAdminRoute = (req, res, next) => {
   }
 };
 
+const checkRole = (roles) => (req, res, next) => {
+  if (roles.includes(req.user.role)) {
+    next();
+  } else {
+    res.status(403).json({ status: false, message: "Access denied" });
+  }
+};
+
 const isManagerRoute = (req, res, next) => {
   if (req.user && req.user.isManager) {
     next();
@@ -86,15 +91,23 @@ const isManagerRoute = (req, res, next) => {
   }
 };
 
-const isDeveloperRoute = (req, res, next) => {
-  if (req.user && req.user.isDeveloper) {
+const isEmployeeRoute = (req, res, next) => {
+  // Modified here
+  if (req.user && req.user.isEmployee) {
     next();
   } else {
     return res.status(401).json({
       status: false,
-      message: "Not authorized as developer. Try login as developer.",
+      message: "Not authorized as employee. Try login as employee.",
     });
   }
 };
 
-export { protectRoute, isAdminRoute,isAdminOrManagerRoute, isManagerRoute, isDeveloperRoute };
+export {
+  protectRoute,
+  checkRole,
+  isAdminRoute,
+  isAdminOrManagerRoute,
+  isManagerRoute,
+  isEmployeeRoute,
+};

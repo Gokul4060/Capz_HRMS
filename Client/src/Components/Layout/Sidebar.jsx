@@ -6,7 +6,8 @@ import {
   FaRegCalendarCheck,
   FaUserLarge,
   FaPaste,
- FaListCheck,
+  FaFileCircleQuestion,
+  FaCheckToSlot,
 } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -24,55 +25,59 @@ const adminLinks = [
     label: "User Management",
     link: "userManage",
     icon: <FaArchway />,
+
   },
   {
-    label: "Settings",
-    link: "demodash",
-    icon: <FaArchway />,
+    label: "Projects",
+    link: "project",
+    icon: <FaCheckToSlot />,
   },
+
+  {
+    label: "Timesheet",
+    link: "submission",
+    icon: <FaClipboardList />,
+  },
+
 ];
 
 const userLinks = [
   {
     label: "Dashboard",
-    link: "developerDashboard",
+    link: "employeeDashboard",
     icon: <MdDashboard />,
   },
+
   {
     label: "Profile",
     link: "profile",
     icon: <FaUserLarge />,
   },
+
   {
     label: "Attendance",
     link: "attendance",
     icon: <FaRegCalendarCheck />,
   },
+
   {
     label: "Leave",
     link: "leave",
     icon: <FaRegCalendarCheck />,
   },
-  {
-    label: "Tasks",
-    link: "tasks",
-    icon: <FaClipboardList />,
-  },
+
   {
     label: "todo",
     link: "todo",
     icon: <FaPaste />,
   },
+
   {
     label: "Timesheet",
     link: "timesheet",
     icon: <FaArchway />,
   },
-  {
-    label: "Settings",
-    link: "settings",
-    icon: <MdSettings />,
-  },
+
 ];
 
 
@@ -82,12 +87,19 @@ const managerLinks = [
     link: "managerDashboard",
     icon: <MdDashboard />,
   },
+
   {
     label: "Leave Requests",
     link: "leavereq",
-    icon: <FaListCheck />,
+    icon: <FaFileCircleQuestion />,
   },
 
+  {
+    label: "Project",
+    link: "project",
+    icon: <FaCheckToSlot />,
+  },
+  
 ];
 
 const Sidebar = () => {

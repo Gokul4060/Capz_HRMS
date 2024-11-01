@@ -15,4 +15,4 @@ const Textarea = ({ name, label, placeholder, register, error, className }) => {
   );
 };
 
-export default Textarea
+export default Textarea;

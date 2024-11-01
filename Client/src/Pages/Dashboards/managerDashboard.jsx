@@ -46,7 +46,7 @@ function DeveloperDashboard() {
       ],
       projectcost: "$30,400",
       projectstatus: "Completed",
-      payment: "Done",
+      payment: "Done", 
     },
   ]);
   const [open, setOpen] = useState(false);

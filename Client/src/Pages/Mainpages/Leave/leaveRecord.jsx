@@ -4,8 +4,8 @@ import {
   useDeleteLeaveRequestMutation,
 } from "../../../redux/slices/api/leaveApiSlice";
 import { toast } from "react-toastify";
-import { FaTrash } from "react-icons/fa"; // Import the trash icon
-import { FaSpinner } from "react-icons/fa"; // Spinner for loading
+import { FaTrash } from "react-icons/fa"; 
+import { FaSpinner } from "react-icons/fa";
 
 const LeaveRecords = ({ shouldRefetchRecords }) => {
   const { data: leaveRecords, isLoading, refetch } = useGetUserleaveQuery();
@@ -17,13 +17,13 @@ const LeaveRecords = ({ shouldRefetchRecords }) => {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedLeaveId, setSelectedLeaveId] = useState(null);
 
-  // Automatically refetch leave records if deletion is successful
+  
   useEffect(() => {
     if (isDeleteSuccess) {
       refetch();
     }
 
-    // Refetch the leave records if 'shouldRefetchRecords' is true
+    
     if (shouldRefetchRecords) {
       refetch();
     }
@@ -43,7 +43,7 @@ const LeaveRecords = ({ shouldRefetchRecords }) => {
     try {
       await deleteLeaveRequest(selectedLeaveId).unwrap();
       toast.success("Leave record deleted successfully!");
-      closeDialog(); // Close dialog after deletion
+      closeDialog(); 
     } catch (error) {
       const errorMsg = error?.data?.message || "Failed to delete leave record.";
       toast.error(errorMsg);
@@ -155,7 +155,7 @@ const LeaveRecords = ({ shouldRefetchRecords }) => {
         </table>
       </div>
 
-      {/* Small Dialog Box */}
+    
       {showDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-80 p-6">

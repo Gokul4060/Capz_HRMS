@@ -37,7 +37,7 @@ export const PRIOTITYSTYELS = {
   low: "text-blue-600",
 };
 
-export const TASK_TYPE = {
+export const PROJECT_TYPE = {
   todo: "bg-blue-600",
   "in progress": "bg-yellow-600",
   completed: "bg-green-600",

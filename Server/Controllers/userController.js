@@ -14,16 +14,29 @@ export const registerUser = async (req, res) => {
       password,
       isAdmin,
       isManager,
-      isDeveloper,
+      isEmployee,
       role,
       title,
+      employeeID,
+      reportingManager,
     } = req.body;
 
-    if (await User.findOne({ email })) {
+    if (await User.findOne({ $or: [{ email }, { employeeID }] })) {
       return res.status(400).json({
         status: false,
-        message: "User already exists",
+        message: "User with this email or Employee ID already exists",
       });
+    }
+
+    let manager = null;
+    if (role === "Employee" && reportingManager) {
+      manager = await User.findById(reportingManager);
+      if (!manager) {
+        return res.status(400).json({
+          status: false,
+          message: "Reporting Manager not found",
+        });
+      }
     }
 
     const user = await User.create({
@@ -32,17 +45,23 @@ export const registerUser = async (req, res) => {
       password,
       isAdmin,
       isManager,
-      isDeveloper,
+      isEmployee,
       role,
       title,
+      employeeID,
+      reportingManager: manager ? manager._id : null,
       profile: {},
     });
 
     if (user) {
       if (isAdmin) createJWT(res, user._id);
-
       user.password = undefined;
-      return res.status(201).json(user);
+
+      return res.status(201).json({
+        status: true,
+        message: "User registered successfully",
+        user,
+      });
     } else {
       return res
         .status(400)
@@ -52,6 +71,7 @@ export const registerUser = async (req, res) => {
     handleError(error, res);
   }
 };
+
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -98,7 +118,9 @@ export const logoutUser = async (req, res) => {
 
 export const getEmployeeList = async (req, res) => {
   try {
-    const users = await User.find().select("name title role email isActive");
+    const users = await User.find().select(
+      "name title role email employeeID isActive"
+    );
     res.status(200).json(users);
   } catch (error) {
     handleError(error, res);
@@ -125,12 +147,30 @@ export const updateUserProfile = async (req, res) => {
         user.profile.imageUrl = updateData.profile.imageUrl;
       }
 
+      // Update the employeeID if provided
+      if (updateData.employeeID) {
+        // Ensure employeeID is unique
+        const existingUser = await User.findOne({
+          employeeID: updateData.employeeID,
+        });
+        if (
+          existingUser &&
+          existingUser._id.toString() !== user._id.toString()
+        ) {
+          return res.status(400).json({
+            status: false,
+            message: "Employee ID already in use",
+          });
+        }
+        user.employeeID = updateData.employeeID;
+      }
+
       user.name = updateData.name || user.name;
       user.title = updateData.title || user.title;
       user.role = updateData.role || user.role;
       user.isAdmin = updateData.isAdmin ?? user.isAdmin;
       user.isManager = updateData.isManager ?? user.isManager;
-      user.isDeveloper = updateData.isDeveloper ?? user.isDeveloper;
+      user.isEmployee = updateData.isEmployee ?? user.isEmployee; // Modified here
 
       const updatedUser = await user.save();
       updatedUser.password = undefined;
@@ -183,7 +223,6 @@ export const deleteUserProfile = async (req, res) => {
   }
 };
 
-
 export const profileinfo = async (req, res) => {
   try {
     const { userId, isAdmin } = req.user;
@@ -196,7 +235,7 @@ export const profileinfo = async (req, res) => {
       identityInformation,
       resignationInformation,
       bankInformation,
-    } = req.body; // Extract new fields
+    } = req.body;
 
     const id =
       isAdmin && userId === _id
@@ -224,7 +263,6 @@ export const profileinfo = async (req, res) => {
         };
       }
 
-      // Update contactInformation if present
       if (contactInformation) {
         user.profile.contactInformation = {
           ...user.profile.contactInformation,
@@ -232,7 +270,6 @@ export const profileinfo = async (req, res) => {
         };
       }
 
-      // Update bankInformation if present
       if (bankInformation) {
         user.profile.bankInformation = {
           ...user.profile.bankInformation,
@@ -240,7 +277,6 @@ export const profileinfo = async (req, res) => {
         };
       }
 
-      // Update hierarchyInformation if present
       if (hierarchyInformation) {
         user.profile.hierarchyInformation = {
           ...user.profile.hierarchyInformation,
@@ -248,7 +284,6 @@ export const profileinfo = async (req, res) => {
         };
       }
 
-      // Update identityInformation if present
       if (identityInformation) {
         user.profile.identityInformation = {
           ...user.profile.identityInformation,
@@ -256,7 +291,6 @@ export const profileinfo = async (req, res) => {
         };
       }
 
-      // Update resignationInformation if present
       if (resignationInformation) {
         user.profile.resignationInformation = {
           ...user.profile.resignationInformation,
@@ -265,7 +299,7 @@ export const profileinfo = async (req, res) => {
       }
 
       const updatedUser = await user.save();
-      updatedUser.password = undefined; // Exclude password from the response
+      updatedUser.password = undefined;
 
       res.status(200).json({
         status: true,
@@ -283,8 +317,8 @@ export const profileinfo = async (req, res) => {
 export const getApprovers = async (req, res) => {
   try {
     const approvers = await User.find({
-      $or: [{ role: "Manager" }], // Assuming 'role' field stores roles
-    }).select("name _id role"); // Only select necessary fields like name and _id
+      $or: [{ role: "Manager" }],
+    }).select("name _id role");
 
     if (!approvers || approvers.length === 0) {
       return res.status(404).json({
@@ -304,8 +338,34 @@ export const getApprovers = async (req, res) => {
   }
 };
 
+export const getEmployeesByManager = async (req, res) => {
+  try {
+    const { managerId } = req.params; // ID of the manager
 
-//get user detail
+    // Find all users who have the specified manager as their reporting manager
+    const employees = await User.find({ reportingManager: managerId }).select(
+      "name _id role email employeeID"
+    );
+
+    if (!employees || employees.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No employees found reporting to this manager",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Employees fetched successfully",
+      employees,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: false, message: "Server error" });
+  }
+};
+
+// Get user detail
 export const getProfileInfo = async (req, res) => {
   try {
     const { userId, isAdmin } = req.user;
@@ -345,13 +405,41 @@ export const getProfileInfo = async (req, res) => {
   }
 };
 
+export const getProfileInfoById = async (req, res) => {
+  try {
+    const { id } = req.params; // Get user ID from request params
 
+    const user = await User.findById(id);
 
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
 
+    // Destructure profile information from user document
+    const {
+      personalInformation,
+      workInformation,
+      contactInformation,
+      hierarchyInformation,
+      identityInformation,
+      resignationInformation,
+      bankInformation,
+      employeeID, // Include employeeID in the response
+    } = user.profile;
 
-
-
-
-
-
-
+    res.status(200).json({
+      status: true,
+      message: "Profile Information Fetched Successfully.",
+      employeeID, // Include employeeID in the response
+      personalInformation,
+      workInformation,
+      contactInformation,
+      hierarchyInformation,
+      identityInformation,
+      resignationInformation,
+      bankInformation,
+    });
+  } catch (error) {
+    handleError(error, res);
+  }
+};

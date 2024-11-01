@@ -4,7 +4,7 @@ import {
   markClockOut,
   getUserAttendance,
   getAllAttendance,
-  updateAttendance,
+  deleteAttendanceRecords,
 } from "../Controllers/attendanceController.js";
 
 import {
@@ -28,7 +28,11 @@ router.route("/clockout").put(protectRoute, markClockOut);
 // Route for admins and managers to view attendance for all users
 router.route("/all").get(protectRoute, isAdminOrManagerRoute, getAllAttendance);
 
-// Route for admins to update attendance records
-router.route("/:id").put(protectRoute, isAdminRoute, updateAttendance);
+
+
+router
+  .route("/delete/:id")
+  .delete(protectRoute, isAdminRoute, deleteAttendanceRecords); 
 
 export default router;
+

@@ -1,6 +1,4 @@
 import React from "react";
-import img from "../../assets/close.jpg.jpg";
-
 import Personal_Info from "./subProfile/Personal_Info";
 import Work_Info from "./subProfile/Work_Info";
 import Contact from "./subProfile/Contact";
@@ -9,6 +7,7 @@ import Heirarchy_Info from "./subProfile/Heirarchy_Info";
 import Identity_Info from "./subProfile/Identity_Info";
 import Exit_Info from "./subProfile/Exit_Info";
 import Profile_Pic from "./subProfile/Profile_Pic";
+
 
 const profile = () => {
   return (

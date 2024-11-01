@@ -20,9 +20,16 @@ const AllEmployees = () => {
   const [selected, setSelected] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const { data, isLoading, refetch } = useGetEmployeeListQuery();
   const [deleteUser] = useDeleteUserMutation();
   const [userAction] = useUserActionMutation();
+
+  const totalItems = data?.length || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const userActionHandler = async () => {
     try {
@@ -76,7 +83,7 @@ const AllEmployees = () => {
   };
 
   const TableHeader = () => (
-    <thead className="bg-customplam rounded-lg">
+    <thead className="bg-customplam rounded-2xl">
       <tr className="text-left text-sm font-medium text-white">
         <th className="py-4 px-6">Full Name</th>
         <th className="py-4 px-6">Title</th>
@@ -137,6 +144,15 @@ const AllEmployees = () => {
     </tr>
   );
 
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) setCurrentPage(newPage);
+  };
+
+  const paginatedData = data?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <>
       <div className="w-full mb-6">
@@ -162,11 +178,28 @@ const AllEmployees = () => {
               <table className="w-full rounded-lg shadow">
                 <TableHeader />
                 <tbody>
-                  {data?.map((user, index) => (
+                  {paginatedData?.map((user, index) => (
                     <TableRow key={index} user={user} />
                   ))}
                 </tbody>
               </table>
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  &lt;
+                </button>
+                <span className="mx-4 text-lg font-medium">{currentPage}</span>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  &gt;
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ const Report = () => {
       <h2 className="text-xl font-semibold mb-4">Report</h2>
       <div className="flex items-center justify-around">
         <div className="w-1/2">
-          {/* Placeholder Donut Chart */}
+  
           <div className="relative">
             <svg className="w-24 h-24">
               <circle

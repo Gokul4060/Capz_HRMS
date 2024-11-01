@@ -10,7 +10,7 @@ import {
 import { useUpdateUserMutation } from "../../../redux/slices/api/userApiSlice";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import app from "./config";
+import {app} from "./config"
 
 
 function Profile_Pic() {
@@ -126,9 +126,16 @@ function Profile_Pic() {
           )}
         </div>
         <div className="flex flex-col mt-3 md:mt-0">
-          <p className="font-bold text-lg md:text-base">Name : {user.name}</p>
-          <p className="text-gray-400 text-sm md:text-base"></p>
-          <p className="text-sm text-gray-400"> Role : {user.role}</p>
+          <p className="font-bold text-lg md:text-base">
+            Name : <span className="font-sans">{user.name}</span>{" "}
+          </p>
+          <p className="font-bold text-gray-400 text-sm md:text-base">
+            ID : <span className="font-sans"> {user.employeeID} </span>{" "}
+          </p>
+          <p className=" font-bold text-sm text-gray-400">
+            {" "}
+            Role : <span  className="font-sans"> {user.role} </span>
+          </p>
         </div>
         <div
           onClick={

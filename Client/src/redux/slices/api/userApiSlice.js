@@ -71,6 +71,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    getProfileInfoById: builder.query({
+      query: (id) => ({
+        url: `${USER_URL}/data/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
 
     getPersonaldata: builder.query({
       query: () => ({
@@ -104,4 +111,5 @@ export const {
   useGetApproversQuery,
   usePersonaldataMutation,
   useGetPersonaldataQuery,
+  useGetProfileInfoByIdQuery,
 } = userApiSlice;
