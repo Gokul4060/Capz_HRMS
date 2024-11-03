@@ -10,7 +10,7 @@ import {
   postProjectActivity, 
   trashProject, 
   updateProject, 
-} from "../controllers/projectController.js"; // Update the controller paths as needed
+} from "../Controllers/projectController.js"; // Update the controller paths as needed
 import { isAdminRoute, protectRoute, isAdminOrManagerRoute } from "../middlewares/authMiddlewave.js";
 
 const router = express.Router();
