@@ -8,7 +8,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:8888",
+        target: "https://capz-backend.onrender.com",
         changeOrigin: true,
       },
     },
