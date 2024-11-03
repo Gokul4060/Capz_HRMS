@@ -11,7 +11,7 @@ import {
   getProfileInfo,
   getApprovers,
   getProfileInfoById,
-} from "../controllers/userController.js";
+} from "../Controllers/userController.js";
 
 import { protectRoute, isAdminOrManagerRoute, isAdminRoute } from "../middlewares/authMiddlewave.js";
 
