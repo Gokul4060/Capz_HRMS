@@ -22,7 +22,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [ "https://capz-backend.onrender.com"],
+    origin: ["http://localhost:3000", "http://localhost:3001"],
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     credentials: true,
   })
