@@ -119,5 +119,5 @@ export const {
   useGetPendingLeaveRequestsQuery,
   useGetApproversQuery,
   useGetLeaveHistoryQuery,
-  useGetAllLeavesQuery, // Make sure this is exported
+  useGetAllLeavesQuery,
 } = leaveApiSlice;
