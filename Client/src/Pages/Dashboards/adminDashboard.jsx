@@ -3,6 +3,7 @@ import "react-circular-progressbar/dist/styles.css";
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { useSelector } from "react-redux";
+import img from "../../assets/undraw.png"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -543,7 +544,7 @@ function AdminDashboard() {
           <div className="lg:border bg-white lg:rounded-lg -ml-3 mt-5 lg:mt-4 sm:mt-10 lg:ml-[580px] flex lg:flex-col md:flex-row md:w-80 lg:w-96 lg:shadow-md p-5">
             <div className="flex-shrink-0">
               <img
-                src="https://freepngimg.com/thumb/cartoon/4-2-cartoon-transparent-thumb.png"
+                src={img}
                 className="h-36 lg:-ml-3  md:ml-40 w-auto md:h-52 md:w-52 lg:w-40 lg:h-32 object-fill"
                 alt="image"
               />

@@ -1,6 +1,6 @@
 import { apiSlice } from "../apiSlice";
 
-const PROJECTS_URL = "/project"; // Updated base URL to project
+const PROJECTS_URL = "/project"; 
 
 export const projectApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -12,6 +12,14 @@ export const projectApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    GetSingleProject: builder.query({
+      query: () => ({
+        url: `${PROJECTS_URL}/single`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    
     getAllProjects: builder.query({
       query: ({ strQuery, isTrashed, search }) => ({
         url: `${PROJECTS_URL}?stage=${strQuery}&isTrashed=${isTrashed}&search=${search}`,
@@ -56,8 +64,16 @@ export const projectApiSlice = apiSlice.injectEndpoints({
     }),
 
     createTask: builder.mutation({
-      query: (id,data) => ({
+      query: (id, data) => ({
         url: `${PROJECTS_URL}/create-task/${id}`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+    postProjectActivity: builder.mutation({
+      query: (id, data) => ({
+        url: `${PROJECTS_URL}/activity/${id}`,
         method: "POST",
         body: data,
         credentials: "include",
@@ -72,6 +88,8 @@ export const {
   useCreateProjectMutation,
   useDuplicateProjectMutation,
   useUpdateProjectMutation,
+  usePostProjectActivityMutation,
+  useGetSingleProjectQuery,
   useTrashProjectMutation,
   
 } = projectApiSlice;

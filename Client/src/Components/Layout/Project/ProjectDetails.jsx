@@ -11,6 +11,7 @@ import {
   MdOutlineMessage,
   MdTaskAlt,
 } from "react-icons/md";
+import { usePostProjectActivityMutation, useGetSingleProjectQuery  } from "../../../redux/slices/api/projectApiSlice"
 import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -88,9 +89,9 @@ const act_types = [
 
 const ProjectDetails = () => {
   const { id } = useParams();
-
+   const { data, isLoading, refetch } = useGetSingleProjectQuery(id);
   const [selected, setSelected] = useState(0);
-  const project = projects[3]; // Updated to project
+  const project = data?.project; // Updated to project
 
   return (
     <div className="w-full flex flex-col gap-3 mb-4 overflow-y-hidden">
@@ -240,7 +241,7 @@ const ProjectDetails = () => {
           </>
         ) : (
           <>
-            <Activities activity={project?.activities} id={id} />{" "}
+            <Activities activity={data?.activities} id={id} refetch={refetch}/>
             {/* Updated */}
           </>
         )}
@@ -249,12 +250,31 @@ const ProjectDetails = () => {
   );
 };
 
-const Activities = ({ activity, id }) => {
+const Activities = ({ activity, id, refetch }) => {
   const [selected, setSelected] = useState(act_types[0]);
   const [text, setText] = useState("");
-  const isLoading = false;
 
-  const handleSubmit = async () => {};
+  const [postActivity, {isLoading}] = usePostProjectActivityMutation();
+
+  const handleSubmit = async () => {
+    try {
+        const activityData = {
+          type: selected?.toLowerCase(),
+          activity:text,
+        }
+        const result = await postActivity({
+          data: activityData,
+          id
+        }).unwrap();
+        console.log(result);
+        setText("");
+        toast.success(result?.message);
+        refetch();
+    } catch (error)   {
+      console.log(error);
+      toast.error(error?.data?.message || error.error);
+    }
+  };
 
   const Card = ({ item }) => {
     return (
