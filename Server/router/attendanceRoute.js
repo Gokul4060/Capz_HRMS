@@ -5,13 +5,15 @@ import {
   getUserAttendance,
   getAllAttendance,
   deleteAttendanceRecords,
+  approveAttendance, // Import the new controller function
+  rejectAttendance, // Import the new controller function
 } from "../Controllers/attendanceController.js";
 
 import {
   protectRoute,
   isAdminRoute,
-
-  isAdminOrManagerRoute, // Import the new middleware
+  isAdminOrManagerRoute,
+  isManagerRoute, // Import the middleware
 } from "../middlewares/authMiddlewave.js";
 
 const router = express.Router();
@@ -28,11 +30,17 @@ router.route("/clockout").put(protectRoute, markClockOut);
 // Route for admins and managers to view attendance for all users
 router.route("/all").get(protectRoute, isAdminOrManagerRoute, getAllAttendance);
 
-
-
+// Route for admins to delete specific attendance records
 router
   .route("/delete/:id")
-  .delete(protectRoute, isAdminRoute, deleteAttendanceRecords); 
+  .delete(protectRoute, isAdminRoute, deleteAttendanceRecords);
+
+// Route for admins or managers to approve attendance
+router
+  .route("/approve/:id")
+  .put(protectRoute, isManagerRoute, approveAttendance);
+
+// Route for admins or managers to reject attendance
+router.route("/reject/:id").put(protectRoute, isManagerRoute, rejectAttendance);
 
 export default router;
-

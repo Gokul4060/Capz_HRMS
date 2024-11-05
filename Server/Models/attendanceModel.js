@@ -18,13 +18,18 @@ const attendanceSchema = new mongoose.Schema(
       type: Date,
     },
     totalWorkHours: {
-      type: Number, 
+      type: Number,
       default: 0,
     },
     status: {
       type: String,
       enum: ["Present", "Absent", "On Leave", "Half Day"],
       default: "Present",
+    },
+    approvalStatus: {
+      type: String,
+      enum: ["Pending", "Approved", "Rejected"],
+      default: "Pending",
     },
   },
   { timestamps: true }

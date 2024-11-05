@@ -30,7 +30,8 @@ import TimeSheetget from "./Pages/Mainpages/AdminMain/TimeSheet/timesheetget";
 import TimeDetails from "./Pages/Timesheet/infoTime"
 import TimeSubmission from "./Pages/Timesheet/submission";
 import Project from "./Pages/Mainpages/project/project";
-import TaskDetails from "./Components/Layout/Project/ProjectDetails"
+import TaskDetails from "./Components/Layout/Project/ProjectDetails";
+import AttendanceRequest from "./Pages/Mainpages/Attendance/Requests/attendanceRequest"
 
 
 function Layout() {
@@ -130,6 +131,8 @@ function App() {
             path="/attendance/:admin"
             element={<AdminAttendanceUpdate />}
           />
+          <Route path="/attendance-req" element={<AttendanceRequest />} />
+
           <Route path="/manager/:attendance" element={<ManagerAttendance />} />
           <Route path="/leavereq" element={<ManagerRecords />} />
           <Route path="/leave" element={<Leave />} />
@@ -144,7 +147,6 @@ function App() {
           <Route path="/profile" element={<PROFILE />} />
           <Route path="/employee" element={<EmployeeDetails />} />
           <Route path="/employee/:id" element={<EmployeeDetailPage />} />
-
           {/*project Route */}
           <Route path="/project" element={<Project />} />
           <Route path="/project/:id" element={<TaskDetails />} />

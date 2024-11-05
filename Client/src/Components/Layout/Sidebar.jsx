@@ -93,13 +93,17 @@ const managerLinks = [
     link: "leavereq",
     icon: <FaFileCircleQuestion />,
   },
+  {
+    label: "attendance Requests",
+    link: "attendance-req",
+    icon: <FaFileCircleQuestion />,
+  },
 
   {
     label: "Project",
     link: "project",
     icon: <FaCheckToSlot />,
   },
-  
 ];
 
 const Sidebar = () => {

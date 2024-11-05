@@ -5,40 +5,39 @@ import moment from "moment";
 export const markAttendance = async (req, res) => {
   try {
     const { userId } = req.user;
+    const { status, approvalStatus } = req.body; // Get status and approvalStatus from the request body
 
-    const today = moment().startOf("day").toDate(); 
-    const attendance = await Attendance.findOne({
+    const today = new Date().setHours(0, 0, 0, 0); // Today's date at midnight
+    const existingRecord = await Attendance.findOne({
       user: userId,
       date: today,
     });
 
-   
-    if (attendance) {
-      return res.status(400).json({
-        status: false,
-        message: "Attendance already marked for today.",
-      });
+    if (existingRecord) {
+      return res
+        .status(400)
+        .json({ message: "Attendance already marked for today." });
     }
 
     // Create a new attendance record
     const newAttendance = await Attendance.create({
       user: userId,
       date: today,
-      clockIn: moment().toDate(),
+      clockIn: new Date(),
+      status,
+      approvalStatus,
     });
 
     return res.status(201).json({
-      status: true,
       message: "Attendance marked successfully",
       attendance: newAttendance,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ status: false, message: "Server error" });
+    console.error("Error marking attendance:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Mark clock out
 // Mark clock out
 export const markClockOut = async (req, res) => {
   try {
@@ -250,5 +249,59 @@ export const deleteAttendanceRecords = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: false, message: 'Server error' });
+  }
+};
+
+// Controller for approving attendance
+export const approveAttendance = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const attendance = await Attendance.findById(id);
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance record not found." });
+    }
+
+    attendance.approvalStatus = "Approved"; // Update approval status
+    await attendance.save();
+
+    res.status(200).json({ message: "Attendance approved successfully" });
+  } catch (error) {
+    console.error("Error approving attendance:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Reject an attendance record (Admin/Manager only)
+export const rejectAttendance = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the attendance record by ID
+    const attendance = await Attendance.findById(id);
+
+    if (!attendance) {
+      return res.status(404).json({
+        status: false,
+        message: "Attendance record not found",
+      });
+    }
+
+    // Update the status to "rejected"
+    attendance.status = "rejected";
+    await attendance.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Attendance record rejected successfully",
+      attendance,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: false,
+      message: "Server error",
+    });
   }
 };

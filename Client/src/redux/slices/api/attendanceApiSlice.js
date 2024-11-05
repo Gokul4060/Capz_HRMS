@@ -40,6 +40,20 @@ export const attendanceApiSlice = apiSlice.injectEndpoints({
         body: { startDate, endDate },
       }),
     }),
+    approveAttendance: builder.mutation({
+      query: (id) => ({
+        url: `${ATTENDANCE_URL}/approve/${id}`,
+        method: "PUT",
+        credentials: "include",
+      }),
+    }),
+    rejectAttendance: builder.mutation({
+      query: (id) => ({
+        url: `${ATTENDANCE_URL}/reject/${id}`,
+        method: "PUT",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -49,5 +63,7 @@ export const {
   useGetUserAttendanceQuery,
   useGetAllAttendanceQuery,
   useDeleteAttendanceRecordsMutation,
+  useApproveAttendanceMutation,
+  useRejectAttendanceMutation,
   
 } = attendanceApiSlice;

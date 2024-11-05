@@ -9,6 +9,12 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import {
+  FaUserCheck,
+  FaUserClock,
+  FaHourglassHalf,
+  FaUserTimes,
+} from "react-icons/fa";
 
 const Attendance = () => {
   const [markAttendance, { isLoading: isMarkingAttendance }] =
@@ -136,11 +142,30 @@ const Attendance = () => {
 
   const handleMarkAttendance = async () => {
     try {
-      const response = await markAttendance().unwrap();
+      const currentTime = new Date();
+      const lateThreshold = new Date();
+      lateThreshold.setHours(9, 30, 0, 0); // 9:30 AM
+
+      let attendanceData = {
+        status: "Present",
+        approvalStatus: "Approved",
+      };
+
+      // Check if current time is after the late threshold (9:30 AM)
+      if (currentTime > lateThreshold) {
+        attendanceData.status = "Late";
+        attendanceData.approvalStatus = "Pending"; // Requires manager approval
+        toast.info(
+          "You are marking attendance as late. It will require manager approval."
+        );
+      }
+
+      const response = await markAttendance(attendanceData).unwrap();
+
       toast.success("Attendance marked successfully!");
       setTimeIn(response.clockIn); // Set the "Time In" after marking attendance
       startTimer(); // Start the timer when attendance is marked
-      refetch(); // Trigger a refresh of attendance records
+      refetch(); // Refresh attendance records
     } catch (error) {
       const errorMsg =
         error?.data?.message || "Failed to mark attendance. Try again.";
@@ -168,6 +193,68 @@ const Attendance = () => {
       toast.error(errorMsg);
     }
   };
+  const calculateStatistics = () => {
+    const attendanceMarked = attendanceRecords.filter(
+      (record) => record.status === "Present"
+    ).length;
+    const lateMarked = attendanceRecords.filter(
+      (record) => record.status === "Late"
+    ).length;
+    const pending = attendanceRecords.filter(
+      (record) => record.status === "Pending"
+    ).length;
+    const approvedRejected = attendanceRecords.filter(
+      (record) =>
+        record.approvalStatus === "Approved" ||
+        record.approvalStatus === "Rejected"
+    ).length;
+
+    return { attendanceMarked, lateMarked, pending, approvedRejected };
+  };
+
+  const { attendanceMarked, lateMarked, pending, approvedRejected } =
+    calculateStatistics();
+
+  const renderStatisticsCards = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Attendance Marked */}
+      <div className="rounded-lg shadow-lg p-6 bg-gradient-to-r from-blue-500 to-blue-700 text-white flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Attendance Marked</h2>
+          <p className="text-4xl font-bold">{attendanceMarked}</p>
+        </div>
+        <FaUserCheck size={40} className="opacity-80" />
+      </div>
+
+      {/* Late Marked */}
+      <div className="rounded-lg shadow-lg p-6 bg-gradient-to-r from-red-500 to-red-700 text-white flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Late Marked</h2>
+          <p className="text-4xl font-bold">{lateMarked}</p>
+        </div>
+        <FaUserClock size={40} className="opacity-80" />
+      </div>
+
+      {/* Pending Requests */}
+      <div className="rounded-lg shadow-lg p-6 bg-gradient-to-r from-orange-500 to-orange-700 text-white flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Pending Requests</h2>
+          <p className="text-4xl font-bold">{pending}</p>
+        </div>
+        <FaHourglassHalf size={40} className="opacity-80" />
+      </div>
+
+      {/* Approved / Rejected */}
+      <div className="rounded-lg shadow-lg p-6 bg-gradient-to-r from-green-500 to-green-700 text-white flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Approved / Rejected</h2>
+          <p className="text-4xl font-bold">{approvedRejected}</p>
+        </div>
+        <FaUserTimes size={40} className="opacity-80" />
+      </div>
+    </div>
+  );
+
 
   return (
     <div className="container mx-auto mt-3 p-6">
@@ -176,6 +263,9 @@ const Attendance = () => {
         autoClose={3000}
         hideProgressBar={false}
       />
+      {renderStatisticsCards()}
+
+    
       {/* Top section for today's attendance and statistics */}
       <div className="flex gap-8 mb-8">
         {/* Today's Attendance */}
